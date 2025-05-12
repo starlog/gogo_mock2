@@ -1,0 +1,20 @@
+{
+  "name": "gogo-mobile-mock-api",
+  "version": "1.0.0",
+  "description": "고고모바일 API Mock 서버입니다. 고객 정보 확인, 부가 서비스 가입, 해지, 청구서 내역 조회, 결제 방법 조회 및 변경을 위한 API를 제공합니다.",
+  "main": "index.js",
+  "scripts": {
+	"prestart": "npm install",
+	"start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Unlicense",
+  "private": true,
+  "dependencies": {
+    "connect": "^3.2.0",
+    "js-yaml": "^3.3.0",
+    "oas3-tools": "^2.2.3"
+  }
+}
