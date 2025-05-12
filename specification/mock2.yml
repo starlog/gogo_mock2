@@ -1,0 +1,299 @@
+openapi: 3.0.4
+info:
+  title: Gogo Mobile Mock API
+  description: 고고모바일 API Mock 서버입니다. 고객 정보 확인, 부가 서비스 가입, 해지, 청구서 내역 조회, 결제 방법 조회 및 변경을 위한 API를 제공합니다.
+  version: 1.0.0
+  contact:
+    name: Felix Cho
+    email: felix@notal.kr
+servers:
+  - url: http://localhost:13000
+paths:
+  /identification:
+    post:
+      summary: 고객 정보 확인
+      description: 고객의 정보를 확인하여 서비스 계약 번호를 확인
+      operationId: customerIdentification
+      tags:
+        - 고객 정보
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                  example: 01012345678
+                  description: "고객 전화번호, 숫자만 입력"
+                name:
+                  type: string
+                  example: 홍길동
+                  description: "고객 이름, 한글로 입력. 스페이스 없음"
+                birthDate:
+                  type: string
+                  format: date
+                  example: 1990-01-01
+                  description: "고객 생년월일, YYYY-MM-DD 형식으로 입력"
+                confirmation:
+                  type: string
+                  example: y
+                  description: "고객이 구두로 본인임을 확인하였는지 여부:y or n"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentificationResponse"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+  /service/enroll:
+    post:
+      summary: 부가 서비스 가입
+      description: 부가 서비스 가입. 서비스 계약 번호와 상품 코드를 입력하여 부가 서비스에 가입. 상품 코드는 사전에 클라이언트에서 알고 있는 정보임.
+      operationId: serviceEnrollment
+      tags:
+        - 부가 서비스
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceContractNumber:
+                  type: string
+                  description: "서비스 계약 번호"
+                  example: 01012345678
+                productCode:
+                  type: string
+                  example: 124
+                  description: "부가 서비스 상품 코드"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+  /service/terminate:
+    post:
+      summary: 부가 서비스 해지
+      description: 부가 서비스 해지, 서비스 계약 번호와 상품 코드를 입력하여 부가 서비스 해지. 상품 코드는 사전에 클라이언트에서 알고 있는 정보임.
+      operationId: serviceTermination
+      tags:
+        - 부가 서비스
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceContractNumber:
+                  description: "서비스 계약 번호"
+                  type: string
+                  example: 01012345678
+                productCode:
+                  type: string
+                  example: 124
+                  description: "부가 서비스 상품 코드"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+  /billing/report:
+    post:
+      summary: 월별 청구서 내역 조회
+      description: 청구서 내역을 조회해서 고객에게 제공. 서비스 계약 번호와 청구서 발행 월을 입력하여 청구서 내역을 조회. 청구서 발행 월은 YYYY-MM 형식으로 입력. 응답 데이터는 KT 전산 포멧을 따름.
+      operationId: billingReport
+      tags:
+        - 청구서
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceContractNumber:
+                  description: "서비스 계약 번호"
+                  type: string
+                  example: 01012345678
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingReportResponse"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+  /payment/methodInquiry:
+    post:
+      summary: 결제 방법 조회
+      description: 결제 방법 조회, 서비스 계약 번호와 결제 방법을 입력하여 결제 방법을 조회. 결제 방법은 credit_card, bank_transfer 중 하나로 입력. 결제 기관은 신한카드, 국민카드, 우리카드, 국민은행 등으로 입력.
+      operationId: paymentMethodInquiry
+      tags:
+        - 결제 방법
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceContractNumber:
+                  description: "서비스 계약 번호"
+                  type: string
+                  example: 01012345678
+                paymentMethod:
+                  type: string
+                  example: credit_card
+                  description: "결제 방법: credit_card, bank_transfer"
+                paymentOrganization:
+                  type: string
+                  example: 신한카드
+                  description: "결제 기관: 신한카드, 국민카드, 우리카드, 국민은행 등"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+  /payment/updateMethod:
+    post:
+      summary: 결제 방법 변경
+      description: 결제 방법 변경, 서비스 계약 번호와 결제 방법을 입력하여 결제 방법을 변경. 결제 방법은 credit_card, bank_transfer 중 하나로 입력. 결제 기관은 신한카드, 국민카드, 우리카드, 국민은행 등으로 입력. 계좌 번호와 카드 번호는 공백 없이 입력
+      operationId: paymentMethodUpdate
+      tags:
+        - 결제 방법
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceContractNumber:
+                  description: "서비스 계약 번호"
+                  type: string
+                  example: 01012345678
+                paymentMethod:
+                  type: string
+                  example: credit_card
+                  description: "결제 방법: credit_card, bank_transfer"
+                paymentOrganization:
+                  type: string
+                  example: 신한카드
+                  description: "결제 기관: 신한카드, 국민카드, 우리카드, 국민은행 등"
+                paymentAccountNumber:
+                  type: string
+                  example: 01023455667
+                  description: "결제 계좌 번호 또는 카드 번호"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generalResponse"
+
+components:
+  schemas:
+    IdentificationResponse:
+      type: object
+      properties:
+        resultCode:
+          type: string
+          example: success
+          description: "성공, 실패"
+        resultMessage:
+          type: string
+          example: 성공
+          description: "성공, 실패. 실패인 경우 실패 사유"
+        serviceContractNumber:
+          type: string
+          example: 1234567890
+          description: "서비스 계약 번호"
+        serviceStatus:
+          type: string
+          example: active
+          description: "서비스 상태:active, inactive"
+        paymentMethod:
+          type: string
+          example: credit_card
+          description: "결제 방법: credit_card, bank_transfer"
+    BillingReportResponse:
+      type: object
+      properties:
+        resultCode:
+          type: string
+          example: success
+          description: "성공, 실패"
+        resultMessage:
+          type: string
+          example: 성공
+          description: "성공, 실패. 실패인 경우 실패 사유"
+        billingMonth:
+          type: string
+          example: 2025년 4월
+          description: "청구서 발행 월"
+        billingReportType:
+          type: string
+          example: KT1
+          description: "청구서 형식, 사전에 클라이언트와 공유된 코드. 클라이언트는 이 코드를 기준으로 추가 정보를 해석한다. : KT1, KT2."
+      additionalProperties: true
+    generalResponse:
+      type: object
+      properties:
+        resultCode:
+          type: string
+          example: success
+          description: "성공, 실패"
+        resultMessage:
+          type: string
+          example: 성공
+          description: "성공, 실패. 실패인 경우 실패 사유"
+        errorCode:
+          type: string
+          example: 400
+          description: "에러 코드, 성공인 경우에는 200"
